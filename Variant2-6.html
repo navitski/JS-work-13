@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мой список дел</title>
+	<meta charset=utf-8" />
+<style type="text/css">
+
+body {
+background: #FFBF40;
+}
+
+
+#Enter {
+padding: 10px;
+color: blue;
+}
+
+input {
+text-align: center;
+}
+
+#Block {
+margin-left: 100px;
+}
+
+.addBtn {
+  padding: 10px;
+  background: blue;
+  color: #FFBF40;
+}
+
+.flag {
+  margin: 5px 10px 5px 10px;
+  color: green;
+}
+
+li {
+list-style-type: none;
+}
+
+UL {
+font-size: 25px;
+margin: 20px 10px 30px 50px;
+}
+
+</style>
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+</head>
+<body>
+<div class="header">
+  <h1 align="center">Мой список дел</h1>
+    <ul id="UL"></ul><br><br>
+</div>
+<div id="Block">
+	<input type="text" id="Enter" placeholder="Впишите новую задачу">
+	<span onclick="newEl()" class="addBtn">Добавить</span>
+</div>
+<script>
+	var newId=0;
+	var editId="";
+	var valueId="";
+	var faded = 400;
+	var myAssignments = ["Позвонить заказчикам", "Встретиться с разработчиками", "Забрать посылку", "Отправить домашнее задание"];
+	for (i = 0; i < myAssignments.length; i++) {
+		newGetAssignments(myAssignments[i]);
+	}
+	function newGetAssignments(getText) {
+	  var li = document.createElement("li");
+	  var span;
+	  span = document.createElement("SPAN");
+	  txt = document.createTextNode("✔");
+	  span.className = "flag";
+	  span.onclick = function() {
+		var div = this.parentElement;
+		var txt = div.children[1];
+		if(txt.style.textDecoration == "line-through")
+		{
+			txt.style.textDecoration = "";
+			txt.style.background = "white";
+		}
+		else
+		{
+			txt.style.textDecoration = "line-through";
+			txt.style.background = "lightgrey";
+		}
+	  };
+	  span.appendChild(txt);
+	  li.appendChild(span);
+	  span = creategetText(getText, li);
+	  li.appendChild(span);
+	  document.getElementById("UL").appendChild(li);
+	}
+	function newEl() {
+	 var edit = document.getElementById("Enter");
+	 var inputValue = edit.value;
+	  if (inputValue === '') {
+		return;
+	  }
+	  newGetAssignments(inputValue);
+	  edit.value="";
+	}
+		
+	function doId() {
+		return "ToDoItem_" + newId++;
+	}
+
+	function creategetText(getText) {
+			var span = document.createElement("SPAN");
+			var txt = document.createTextNode(getText);
+			span.appendChild(txt);
+			span.ondblclick =  function () {
+				var thisData = this.innerHTML,
+				$el = $('<input type="text" class="in-edit-text" onkeyup="myEd(event)"/>');
+				editId = this.id;
+				valueId = this.innerText;
+				$(this).fadeToggle(faded, "linear", 
+				function(){
+					$(this).replaceWith($el);
+					$el.val(thisData).focus();
+				});
+			};
+			return span;
+	}
+	function fadeEd(span) {
+		return new Promise(function(resolve, reject) {
+			$('.in-edit-text').fadeToggle(faded, "linear", ()=>{resolve(span)});
+		})
+	}
+	function myEd(event){
+		var x = event.key;
+		var span=null;
+		if (x ==  "Enter") {
+			var txt = $('.in-edit-text').val();
+			if(txt == "") // restore old value if new is empty
+				span = creategetText(valueId);
+			else
+			span = creategetText(txt);
+		}
+		else if (x == "Escape") {
+			span = creategetText(valueId);
+		}
+		if(span)
+		{
+			fadeEd(span).then(
+				span => $('.in-edit-text').replaceWith(span)
+			);
+		}
+	}
+
+	
+
+	
+</script>
+</body>
+</html>
